@@ -1,6 +1,8 @@
 package com.flatcode.littlemovieadmin.Unit;
 
 import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+import static com.flatcode.littlemovieadmin.Unit.DATA.castList;
+import static com.flatcode.littlemovieadmin.Unit.DATA.movieList;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -37,12 +39,15 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
 public class VOID {
+
+    //static List<String> castList;
 
     public static void IntentClear(Context context, Class c) {
         Intent intent = new Intent(context, c);
@@ -144,16 +149,18 @@ public class VOID {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //get views count
                 String lovesCount = DATA.EMPTY + snapshot.child(childDB).getValue();
-                if (lovesCount.equals(DATA.EMPTY) || lovesCount.equals(DATA.NULL)) {
+                if (lovesCount.equals(DATA.EMPTY) || lovesCount.equals(DATA.NULL))
                     lovesCount = DATA.EMPTY + DATA.ZERO;
+
+                int i = Integer.parseInt(lovesCount);
+                if (i > 0) {
+                    int removeLovesCount = Integer.parseInt(lovesCount) - 1;
+                    HashMap<String, Object> hashMap = new HashMap<>();
+                    hashMap.put(childDB, removeLovesCount);
+
+                    DatabaseReference reference = FirebaseDatabase.getInstance().getReference(database);
+                    reference.child(id).updateChildren(hashMap);
                 }
-
-                long removeLovesCount = Long.parseLong(lovesCount) - 1;
-                HashMap<String, Object> hashMap = new HashMap<>();
-                hashMap.put(childDB, removeLovesCount);
-
-                DatabaseReference reference = FirebaseDatabase.getInstance().getReference(database);
-                reference.child(id).updateChildren(hashMap);
             }
 
             @Override
@@ -162,7 +169,6 @@ public class VOID {
             }
         });
     }
-
 
     public static void isFavorite(final ImageView add, final String Id, final String UserId) {
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference().child(DATA.FAVORITES).child(UserId);
@@ -267,8 +273,7 @@ public class VOID {
     }
 
     public static void moreDeleteCategory(Activity activity, Category item, String DB, String idDB
-            , String childDB, String DB2, String idDB2, String childDB2, String DB3, String idDB3
-            , String childDB3) {
+            , String childDB, Boolean cast, Boolean movie) {
         String id = DATA.EMPTY + item.getId();
         String name = DATA.EMPTY + item.getName();
 
@@ -280,13 +285,13 @@ public class VOID {
                 VOID.IntentExtra(activity, CLASS.CATEGORY_EDIT, DATA.CATEGORY_ID, id);
             } else if (which == 1) {
                 dialogOptionDelete(activity, id, name, DATA.CATEGORY, DATA.CATEGORIES, false, DB, idDB
-                        , childDB, DB2, idDB2, childDB2, DB3, idDB3, childDB3);
+                        , childDB, cast, movie);
             }
         }).show();
     }
 
-    public static void moreDeleteCast(Activity activity, Cast item, String DB, String idDB, String childDB
-            , String DB2, String idDB2, String childDB2, String DB3, String idDB3, String childDB3) {
+    public static void moreDeleteCast(Activity activity, Cast item, String DB, String idDB
+            , String childDB, Boolean cast, Boolean movie) {
         String id = DATA.EMPTY + item.getId();
         String name = DATA.EMPTY + item.getName();
 
@@ -294,17 +299,16 @@ public class VOID {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Choose Options").setItems(options, (dialog, which) -> {
-            if (which == 0) {
+            if (which == 0)
                 VOID.IntentExtra(activity, CLASS.CAST_EDIT, DATA.CAST_ID, id);
-            } else if (which == 1) {
-                dialogOptionDelete(activity, id, name, DATA.CAST, DATA.CAST, false, DB, idDB
-                        , childDB, DB2, idDB2, childDB2, DB3, idDB3, childDB3);
-            }
+            else if (which == 1)
+                dialogOptionDelete(activity, id, name, DATA.CAST, DATA.CAST
+                        , false, DB, idDB, childDB, cast, movie);
         }).show();
     }
 
-    public static void moreDeleteMovie(Activity activity, Movie item, String DB, String idDB, String childDB
-            , String DB2, String idDB2, String childDB2, String DB3, String idDB3, String childDB3) {
+    public static void moreDeleteMovie(Activity activity, Movie item, String DB, String idDB
+            , String childDB, Boolean cast, Boolean movie) {
         String id = DATA.EMPTY + item.getId();
         String name = DATA.EMPTY + item.getName();
         String categoryId = DATA.EMPTY + item.getCategoryId();
@@ -317,14 +321,14 @@ public class VOID {
                 VOID.IntentExtra2(activity, CLASS.MOVIE_EDIT, DATA.MOVIE_ID, id, DATA.CATEGORY_ID, categoryId);
             } else if (which == 1) {
                 dialogOptionDelete(activity, id, name, DATA.MOVIE, DATA.MOVIES, false, DB, idDB
-                        , childDB, DB2, idDB2, childDB2, DB3, idDB3, childDB3);
+                        , childDB, cast, movie);
             }
         }).show();
     }
 
     public static void dialogOptionDelete(Activity activity, String id, String name, String type
             , String nameDB, boolean isEditorsChoice, String DB, String idDB, String childDB
-            , String DB2, String idDB2, String childDB2, String DB3, String idDB3, String childDB3) {
+            , Boolean cast, Boolean movie) {
 
         final Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -341,12 +345,14 @@ public class VOID {
         title.setText("Do you want to delete " + name + " ( " + type + " ) " + "?");
 
         dialog.findViewById(R.id.yes).setOnClickListener(view -> {
-            if (isEditorsChoice) {
+            if (isEditorsChoice)
                 dialogUpdateEditorsChoice(dialog, activity, id);
-            } else {
-                deleteDB(dialog, activity, id, name, nameDB, DB, idDB, childDB
-                        , DB2, idDB2, childDB2, DB3, idDB3, childDB3);
-            }
+            else
+                deleteDB(dialog, activity, id, name, nameDB, DB, idDB, childDB);
+            if (cast)
+                deleteCastInfo(id);
+            else if (movie)
+                deleteMovieInfo(id);
         });
 
         dialog.findViewById(R.id.no).setOnClickListener(view2 -> dialog.dismiss());
@@ -355,8 +361,53 @@ public class VOID {
         dialog.getWindow().setAttributes(lp);
     }
 
-    public static void dialogUpdateEditorsChoice(Dialog dialogDelete, Context context, String
-            id) {
+    private static void deleteMovieInfo(String id) {
+        castList = new ArrayList<>();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(DATA.CAST_MOVIE).child(id);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                castList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren())
+                    castList.add(snapshot.getKey());
+
+                for (int i = 0; castList.size() > i; i++)
+                    incrementItemRemoveCount(DATA.CAST, castList.get(i), DATA.MOVIES_COUNT);
+                ref.removeValue();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private static void deleteCastInfo(String id) {
+        movieList = new ArrayList<>();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(DATA.CAST_MOVIE);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                movieList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren())
+                    if (snapshot.child(id).exists())
+                        movieList.add(snapshot.getKey());
+
+                for (int i = 0; movieList.size() > i; i++) {
+                    ref.child(movieList.get(i)).child(id).removeValue();
+                    incrementItemRemoveCount(DATA.MOVIES, movieList.get(i), DATA.CAST_COUNT);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public static void dialogUpdateEditorsChoice(Dialog dialogDelete, Context context, String id) {
         ProgressDialog dialog = new ProgressDialog(context);
         dialog.setMessage("Updating Editors Choice...");
         dialog.show();
@@ -377,9 +428,8 @@ public class VOID {
         });
     }
 
-    public static void deleteDB(Dialog dialogDelete, Activity activity, String id, String
-            name, String nameDB, String DB, String idDB, String childDB
-            , String DB2, String idDB2, String childDB2, String DB3, String idDB3, String childDB3) {
+    public static void deleteDB(Dialog dialogDelete, Activity activity, String id, String name
+            , String nameDB, String DB, String idDB, String childDB) {
 
         ProgressDialog dialog = new ProgressDialog(activity);
         dialog.setTitle("Please wait");
@@ -387,9 +437,8 @@ public class VOID {
         dialog.show();
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(nameDB);
         reference.child(id).removeValue().addOnSuccessListener(unused1 -> {
-            VOID.incrementItemRemoveCount(DB, idDB, childDB);
-            VOID.incrementItemRemoveCount(DB2, idDB2, childDB2);
-            VOID.incrementItemRemoveCount(DB3, idDB3, childDB3);
+            if ((DB != null) & (idDB != null) & (childDB != null))
+                incrementItemRemoveCount(DB, idDB, childDB);
             DATA.isChange = true;
             activity.onBackPressed();
             dialog.dismiss();
@@ -401,9 +450,7 @@ public class VOID {
         });
     }
 
-
-    public static void addToEditorsChoice(Context context, Activity activity, String id,
-                                          int number) {
+    public static void addToEditorsChoice(Context context, Activity activity, String id, int number) {
         ProgressDialog dialog = new ProgressDialog(context);
         dialog.setMessage("Updating Editors Choice...");
         dialog.show();

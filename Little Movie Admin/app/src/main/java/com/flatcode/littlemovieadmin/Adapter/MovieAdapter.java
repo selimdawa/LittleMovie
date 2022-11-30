@@ -84,7 +84,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         holder.item.setAnimation(AnimationUtils.loadAnimation(activity, R.anim.fade_transition_animation));
 
         holder.more.setOnClickListener(v -> VOID.moreDeleteMovie(activity, item, DATA.CATEGORIES, categoeyId
-                , DATA.MOVIES_COUNT, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL));
+                , DATA.MOVIES_COUNT, false, true));
 
         holder.item.setOnClickListener(view -> VOID.IntentExtra2(activity, CLASS.MOVIE_DETAILS,
                 DATA.MOVIE_ID, id, DATA.MOVIE_LINK, movieLink));

@@ -69,7 +69,6 @@ public class CastMovieAddAdapter extends RecyclerView.Adapter<CastMovieAddAdapte
                 castMovie.clear();
                 holder.add.setVisibility(View.VISIBLE);
                 holder.remove.setVisibility(View.GONE);
-
             } else {
                 for (int i = 0; i < castMovie.size(); i++) {
                     if (!castMovie.get(i).equals(id)) {

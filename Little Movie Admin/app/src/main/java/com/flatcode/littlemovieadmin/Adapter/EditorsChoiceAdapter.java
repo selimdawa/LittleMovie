@@ -108,7 +108,7 @@ public class EditorsChoiceAdapter extends RecyclerView.Adapter<EditorsChoiceAdap
                         change.setVisibility(View.VISIBLE);
                         remove.setOnClickListener(v -> VOID.dialogOptionDelete(activity, id, name
                                 , DATA.EDITORS_CHOICE, DATA.EDITORS_CHOICE, true, DATA.NULL, DATA.NULL
-                                , DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL));
+                                , DATA.NULL, false, false));
                         change.setOnClickListener(v -> VOID.IntentExtra2(activity, CLASS.EDITORS_CHOICE_ADD,
                                 DATA.EDITORS_CHOICE_ID, position, DATA.OLD_ID, id));
                     } else {

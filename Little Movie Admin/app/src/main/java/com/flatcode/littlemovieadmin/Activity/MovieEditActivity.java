@@ -41,7 +41,7 @@ import java.util.HashMap;
 public class MovieEditActivity extends AppCompatActivity {
 
     private ActivityMovieEditBinding binding;
-    Activity activity = MovieEditActivity.this;
+    private Activity activity = MovieEditActivity.this;
 
     private String movieId, category;
     private ArrayList<String> categoryList, categoryId;
@@ -71,7 +71,6 @@ public class MovieEditActivity extends AppCompatActivity {
         binding.toolbar.back.setOnClickListener(v -> onBackPressed());
         binding.category.setOnClickListener(v -> categoryPickDialog());
         binding.editImage.setOnClickListener(v -> VOID.CropVideoSquare(activity));
-        binding.cast.setOnClickListener(v -> VOID.Intent(activity, CLASS.CAST_MOVIE));
         binding.toolbar.ok.setOnClickListener(v -> validateData());
     }
 
@@ -97,12 +96,17 @@ public class MovieEditActivity extends AppCompatActivity {
             Toast.makeText(activity, "Pick Category...", Toast.LENGTH_SHORT).show();
         else if (castMovie.size() <= 0)
             Toast.makeText(activity, "Enter Cast...", Toast.LENGTH_SHORT).show();
-        else
-            update();
+        else {
+            if (imageUri == null) {
+                update(DATA.EMPTY);
+            } else {
+                uploadImage();
+            }
+        }
     }
 
-    private void update() {
-        dialog.setMessage("Updating Movie...");
+    private void update(String imageUrl) {
+        dialog.setMessage("Updating Movie DB...");
         dialog.show();
 
         HashMap<String, Object> hashMap = new HashMap<>();
@@ -111,6 +115,8 @@ public class MovieEditActivity extends AppCompatActivity {
         hashMap.put(DATA.YEAR, Integer.parseInt(yearText));
         hashMap.put(DATA.CAST_COUNT, castMovie.size());
         hashMap.put(DATA.CATEGORY_ID, DATA.EMPTY + selectedCategoryId);
+        if (imageUri != null)
+            hashMap.put(DATA.IMAGE, DATA.EMPTY + imageUrl);
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(DATA.MOVIES);
         reference.child(movieId).updateChildren(hashMap).addOnSuccessListener(unused -> {
@@ -123,11 +129,8 @@ public class MovieEditActivity extends AppCompatActivity {
                     VOID.incrementItemRemoveCount(DATA.CATEGORIES, category, DATA.MOVIES_COUNT);
             }
             updateCast();
-            if (imageUri != null) {
-                uploadImage();
-            } else {
-                onBackPressed();
-            }
+            dialog.dismiss();
+            onBackPressed();
         }).addOnFailureListener(e -> {
             dialog.dismiss();
             Toast.makeText(activity, "Failed to update db duo to : " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -135,7 +138,7 @@ public class MovieEditActivity extends AppCompatActivity {
     }
 
     private void uploadImage() {
-        dialog.setMessage("Updating Movie...");
+        dialog.setMessage("Updating Movie Image...");
         dialog.show();
 
         String filePathAndName = "Images/Movie/" + movieId;
@@ -147,30 +150,10 @@ public class MovieEditActivity extends AppCompatActivity {
             while (!uriTask.isSuccessful()) ;
             String uploadedImageUrl = DATA.EMPTY + uriTask.getResult();
 
-            updateImageMovie(uploadedImageUrl, movieId);
+            update(uploadedImageUrl);
         }).addOnFailureListener(e -> {
             dialog.dismiss();
             Toast.makeText(activity, "Failed to upload image due to : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void updateImageMovie(String imageUrl, String id) {
-        dialog.setMessage("Updating image movie...");
-        dialog.show();
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        if (imageUri != null) {
-            hashMap.put(DATA.IMAGE, DATA.EMPTY + imageUrl);
-        }
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(DATA.MOVIES);
-        reference.child(id).updateChildren(hashMap).addOnSuccessListener(unused -> {
-            dialog.dismiss();
-            Toast.makeText(activity, "Image updated...", Toast.LENGTH_SHORT).show();
-            onBackPressed();
-        }).addOnFailureListener(e -> {
-            dialog.dismiss();
-            Toast.makeText(activity, "Failed to update db duo to " + e.getMessage(), Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -180,18 +163,23 @@ public class MovieEditActivity extends AppCompatActivity {
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(DATA.CAST_MOVIE);
 
-        //Remove data to upload
+        //Remove from moviesCount + CastCount
         for (int r = 0; r < castMovieOld.size(); r++) {
             if (!castMovie.contains(castMovieOld.get(r))) {
                 ref.child(movieId).child(castMovieOld.get(r)).removeValue();
+                VOID.incrementItemRemoveCount(DATA.CAST, castMovieOld.get(r), DATA.MOVIES_COUNT);
             }
         }
 
-        //Add data to upload
+        //Add to moviesCount
+        for (int t = 0; t < castMovie.size(); t++)
+            if (!castMovieOld.contains(castMovie.get(t)))
+                VOID.incrementItemCount(DATA.CAST, castMovie.get(t), DATA.MOVIES_COUNT);
+
+        //Add to CastCount
         HashMap<String, Object> hashMap = new HashMap<>();
-        for (int i = 0; i < castMovie.size(); i++) {
+        for (int i = 0; i < castMovie.size(); i++)
             hashMap.put(castMovie.get(i), true);
-        }
 
         //db reference: DB > CastMovie
         assert movieId != null;
@@ -289,6 +277,7 @@ public class MovieEditActivity extends AppCompatActivity {
                     categoryList.add(name);
                     categoryId.add(id);
                 }
+                binding.cast.setOnClickListener(v -> VOID.Intent(activity, CLASS.CAST_MOVIE));
             }
 
             @Override

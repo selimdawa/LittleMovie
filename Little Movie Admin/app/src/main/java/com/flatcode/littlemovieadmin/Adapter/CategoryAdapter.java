@@ -73,8 +73,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         else
             holder.numberMovies.setText(moviesCount);
 
-        holder.more.setOnClickListener(v -> VOID.moreDeleteCategory(activity, item, DATA.NULL, DATA.NULL, DATA.NULL
-                , DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL));
+        holder.more.setOnClickListener(v -> VOID.moreDeleteCategory(activity, item, DATA.NULL,
+                DATA.NULL, DATA.NULL, false, false));
 
         holder.item.setOnClickListener(view ->
                 VOID.IntentExtra2(activity, CLASS.CATEGORY_DETAILS, DATA.CATEGORY_ID, id, DATA.CATEGORY_NAME, name));

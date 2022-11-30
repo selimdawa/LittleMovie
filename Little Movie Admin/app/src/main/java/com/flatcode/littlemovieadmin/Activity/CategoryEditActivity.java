@@ -80,7 +80,7 @@ public class CategoryEditActivity extends AppCompatActivity {
     }
 
     private void uploadImage() {
-        dialog.setMessage("Updating Category...");
+        dialog.setMessage("Updating Category Image...");
         dialog.show();
 
         String filePathAndName = "Images/Category/" + categoryId;
@@ -100,7 +100,7 @@ public class CategoryEditActivity extends AppCompatActivity {
     }
 
     private void updateCategory(String imageUrl) {
-        dialog.setMessage("Updating category image...");
+        dialog.setMessage("Updating Category DB...");
         dialog.show();
 
         HashMap<String, Object> hashMap = new HashMap<>();

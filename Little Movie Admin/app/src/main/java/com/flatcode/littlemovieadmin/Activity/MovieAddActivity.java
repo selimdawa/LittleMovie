@@ -74,7 +74,6 @@ public class MovieAddActivity extends AppCompatActivity {
         binding.image.setOnClickListener(v -> VOID.CropVideoSquare(activity));
         binding.chooseMovie.setOnClickListener(v -> openVideoFiles());
         binding.toolbar.ok.setOnClickListener(v -> validateData());
-        binding.cast.setOnClickListener(v -> VOID.Intent(activity, CLASS.CAST_MOVIE));
 
         metadataRetriever = new MediaMetadataRetriever();
     }
@@ -207,13 +206,13 @@ public class MovieAddActivity extends AppCompatActivity {
     private void uploadCastToDB(String id) {
         dialog.setMessage("Uploading Cast Movie...");
         dialog.show();
-
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(DATA.CAST_MOVIE);
 
         //setup data to upload
         HashMap<String, Object> hashMap = new HashMap<>();
         for (int i = 0; i < castMovie.size(); i++) {
             hashMap.put(castMovie.get(i), true);
+            VOID.incrementItemCount(DATA.CAST, castMovie.get(i), DATA.MOVIES_COUNT);
         }
 
         //db reference: DB > CastMovie
@@ -286,6 +285,7 @@ public class MovieAddActivity extends AppCompatActivity {
                     categoryList.add(name);
                     categoryId.add(id);
                 }
+                binding.cast.setOnClickListener(v -> VOID.Intent(activity, CLASS.CAST_MOVIE));
             }
 
             @Override

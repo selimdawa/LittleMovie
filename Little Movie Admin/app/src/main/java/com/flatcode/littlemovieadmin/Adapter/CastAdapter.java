@@ -75,8 +75,8 @@ public class CastAdapter extends RecyclerView.Adapter<CastAdapter.ViewHolder> im
         else
             holder.numberMovies.setText(moviesCount);
 
-        holder.more.setOnClickListener(v -> VOID.moreDeleteCast(activity, item, DATA.NULL, DATA.NULL, DATA.NULL
-                , DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL, DATA.NULL));
+        holder.more.setOnClickListener(v -> VOID.moreDeleteCast(activity, item, DATA.NULL,
+                DATA.NULL, DATA.NULL, true, false));
 
         holder.item.setOnClickListener(view ->
                 VOID.IntentExtra4(activity, CLASS.CAST_DETAILS, DATA.CAST_ID, id, DATA.CAST_NAME,

@@ -62,10 +62,10 @@ public class CastMovieAddActivity extends AppCompatActivity {
                     assert item != null;
                     list.add(item);
                 }
-                for (int i = 0; i < 10; i++) {
-                    Cast cast = new Cast((DATA.EMPTY + i), (DATA.EMPTY + i), "basic");
-                    list.add(cast);
-                }
+                //for (int i = 0; i < 10; i++) {
+                //    Cast cast = new Cast((DATA.EMPTY + i), (DATA.EMPTY + i), "basic");
+                //    list.add(cast);
+                //}
 
                 Collections.reverse(list);
                 adapter.notifyDataSetChanged();

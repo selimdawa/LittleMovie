@@ -69,6 +69,8 @@ public class DATA {
     public static String MOVIE_ID = "movieId";
     public static String COMMENT = "comment";
     public static String MOVIE = "Movie";
+    public static ArrayList<String> castList;
+    public static ArrayList<String> movieList;
     //Other
     public static final FirebaseAuth AUTH = FirebaseAuth.getInstance();
     public static final FirebaseUser FIREBASE_USER = AUTH.getCurrentUser();
