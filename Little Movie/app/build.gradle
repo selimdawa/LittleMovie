@@ -55,6 +55,13 @@ dependencies {
     implementation 'com.google.android.material:material:1.8.0'        //Material
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'           //Legacy Support
     implementation 'androidx.cardview:cardview:1.0.0'                  //Card View
+    //Firebase
+    implementation platform('com.google.firebase:firebase-bom:31.2.0') //Firebase BOM
+    implementation 'com.google.firebase:firebase-auth'                 //Firebase Auth
+    implementation 'com.google.firebase:firebase-database'             //Firebase Database
+    implementation 'com.google.firebase:firebase-storage'              //Firebase Storage
+    implementation 'com.google.firebase:firebase-analytics'            //Firebase Analytics
+    implementation 'com.google.firebase:firebase-crashlytics'          //Firebase Crashlytics
     //Image
     implementation 'de.hdodenhof:circleimageview:3.1.0'                //Circle image
     implementation 'com.github.bumptech.glide:glide:4.14.2'            //Glide image
@@ -66,5 +73,6 @@ dependencies {
     //Bottom Navigation
     implementation 'com.etebarian:meow-bottom-navigation-java:1.2.0'   //Meow Bottom Navigation
     //Video Player
-    implementation 'com.google.android.exoplayer:exoplayer:2.9.6'
+    //noinspection GradleDependency
+    implementation 'com.google.android.exoplayer:exoplayer:2.9.6'      //Exo Video Player
 }
