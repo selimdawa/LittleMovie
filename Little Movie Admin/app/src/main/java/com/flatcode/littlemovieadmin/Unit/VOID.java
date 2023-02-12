@@ -123,9 +123,8 @@ public class VOID {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //get views count
                 String itemsCount = DATA.EMPTY + snapshot.child(childDB).getValue();
-                if (itemsCount.equals(DATA.EMPTY) || itemsCount.equals(DATA.NULL)) {
+                if (itemsCount.equals(DATA.EMPTY) || itemsCount.equals(DATA.NULL))
                     itemsCount = DATA.EMPTY + DATA.ZERO;
-                }
 
                 long newItemsCount = Long.parseLong(itemsCount) + 1;
                 HashMap<String, Object> hashMap = new HashMap<>();
